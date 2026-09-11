@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autonomous Auto-Fixing DevOps Telegram Bot - DVPS40</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- Ambient background glow effect -->
+  <div class="ambient-glow"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-cluster">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+            <rect x="9" y="9" width="6" height="6" />
+            <line x1="9" y1="1" x2="9" y2="4" />
+            <line x1="15" y1="1" x2="15" y2="4" />
+            <line x1="9" y1="20" x2="9" y2="23" />
+            <line x1="15" y1="20" x2="15" y2="23" />
+            <line x1="20" y1="9" x2="23" y2="9" />
+            <line x1="20" y1="14" x2="23" y2="14" />
+            <line x1="1" y1="9" x2="4" y2="9" />
+            <line x1="1" y1="14" x2="4" y2="14" />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title-row">
+            <h1 class="brand-title">DVPS40 <span class="badge-tag">AUTONOMOUS BOT</span></h1>
+            <span class="live-indicator"><span class="pulse-dot"></span> LIVE AGENT ACTIVE</span>
+          </div>
+          <p class="brand-subtitle">Automated Incident Diagnosis, Code Patching & Verified PR Generation</p>
+        </div>
+      </div>
+
+      <!-- Quick Nav Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('dashboard')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard & Pipeline
+        </button>
+        <button class="nav-tab" onclick="switchTab('telegram')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          Telegram Bot Console
+        </button>
+        <button class="nav-tab" onclick="switchTab('metrics')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          Live Telemetry & Metrics
+        </button>
+        <button class="nav-tab" onclick="switchTab('playground')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Webhook Playground
+        </button>
+        <button class="nav-tab" onclick="switchTab('audit')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Incident Audit Log (<span id="tabIncidentCount">0</span>)
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Top Hero Stat Strip -->
+  <div class="metrics-strip">
+    <div class="metric-chip">
+      <div class="chip-label">ACTIVE INGESTION</div>
+      <div class="chip-val text-cyan">Vercel + Railway</div>
+    </div>
+    <div class="metric-chip">
+      <div class="chip-label">SOURCE BRANCH</div>
+      <div class="chip-val font-mono text-emerald">Dev (Isolated)</div>
+    </div>
+    <div class="metric-chip">
+      <div class="chip-label">AUTO-PR TARGET</div>
+      <div class="chip-val font-mono text-cyan">Dev (Strict PR)</div>
+    </div>
+    <div class="metric-chip">
+      <div class="chip-label">SUCCESSFUL FIX RATE</div>
+      <div class="chip-val text-emerald" id="statFixRate">100%</div>
+    </div>
+    <div class="metric-chip">
+      <div class="chip-label">SYSTEM LATENCY</div>
+      <div class="chip-val text-purple" id="statLatency">142 ms</div>
+    </div>
+  </div>
+
+  <main class="page-container">
+
+    <!-- ====================================================================
+         TAB 1: MAIN DASHBOARD & AUTONOMOUS PIPELINE
+         ==================================================================== -->
+    <div id="tab-dashboard" class="tab-pane active">
+
+      <!-- High Level Flow Graphic (Slide 1) -->
+      <section class="card-box mb-6">
+        <div class="card-title-row">
+          <div>
+            <h2 class="section-heading">High-Level Autonomous Flow</h2>
+            <p class="section-subheading">From secondary platform crash log to GitHub Pull Request on Dev</p>
+          </div>
+          <span class="pill-badge-outline">SLIDE 1 ARCHITECTURE</span>
+        </div>
+
+        <div class="flow-pill-track">
+          <div class="flow-pill pill-orange">
+            <span class="pill-icon">🔥</span>
+            <div>
+              <strong>Error Logs</strong>
+              <small>Vercel / Railway</small>
+            </div>
+          </div>
+          <div class="flow-pill-arrow">➔</div>
+
+          <div class="flow-pill pill-blue">
+            <span class="pill-icon">🤖</span>
+            <div>
+              <strong>Telegram Bot</strong>
+              <small>HMAC Webhook Ingest</small>
+            </div>
+          </div>
+          <div class="flow-pill-arrow">➔</div>
+
+          <div class="flow-pill pill-green">
+            <span class="pill-icon">🧠</span>
+            <div>
+              <strong>AI Fix + 6 Tests</strong>
+              <small>LLM + Verification</small>
+            </div>
+          </div>
+          <div class="flow-pill-arrow">➔</div>
+
+          <div class="flow-pill pill-navy">
+            <span class="pill-icon">🚀</span>
+            <div>
+              <strong>PR → Dev</strong>
+              <small>Interactive Alert</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5-Stage Problem Decomposition (Slide 2) -->
+      <div class="stage-grid mb-6">
+        <div class="stage-card border-orange">
+          <div class="stage-number">01</div>
+          <h3>Detect</h3>
+          <p>Extracts real stack trace, isolating runtime crashes from verbose build clutter.</p>
+        </div>
+        <div class="stage-card border-blue">
+          <div class="stage-number">02</div>
+          <h3>Diagnose</h3>
+          <p>Inspects the target <code>Dev</code> branch source and isolates faulty AST node.</p>
+        </div>
+        <div class="stage-card border-green">
+          <div class="stage-number">03</div>
+          <h3>Fix</h3>
+          <p>Generates targeted, surgical diff patch without touching unrelated files.</p>
+        </div>
+        <div class="stage-card border-purple">
+          <div class="stage-number">04</div>
+          <h3>Validate</h3>
+          <p>Executes syntax, unit, lint, build, integration, and security checks.</p>
+        </div>
+        <div class="stage-card border-cyan">
+          <div class="stage-number">05</div>
+          <h3>Review + PR</h3>
+          <p>Performs automated self-code review and submits Pull Request back to <code>Dev</code>.</p>
+        </div>
+      </div>
+
+      <!-- Live Scenario Launcher (Slide 3 & 4) -->
+      <section class="card-box mb-6">
+        <div class="card-title-row">
+          <div>
+            <h2 class="section-heading">Live Incident Simulator & Log Parser</h2>
+            <p class="section-subheading">Select failure scenarios or trigger real webhook dispatch</p>
+          </div>
+          <button id="runActionBtn" class="primary-btn pulse-glow" onclick="runAutonomousPipeline()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Trigger Full Auto-Fix Cycle</span>
+          </button>
+        </div>
+
+        <!-- Scenario Switcher Buttons -->
+        <div class="scenario-selector-grid mb-4">
+          <button class="scen-card active" id="btn-railway" onclick="selectScenario('railway')">
+            <div class="scen-top">
+              <span class="badge-railway">Railway</span>
+              <span class="scen-tag">Runtime Crash</span>
+            </div>
+            <div class="scen-title">Cannot find module './config/database'</div>
+            <div class="scen-meta">src/server.js:14 • MODULE_NOT_FOUND</div>
+          </button>
+
+          <button class="scen-card" id="btn-syntax" onclick="selectScenario('syntax')">
+            <div class="scen-top">
+              <span class="badge-vercel">Vercel</span>
+              <span class="scen-tag">Syntax Error</span>
+            </div>
+            <div class="scen-title">Python SyntaxError: expected ':'</div>
+            <div class="scen-meta">app/routes.py:15 • Build Crash</div>
+          </button>
+
+          <button class="scen-card" id="btn-ts" onclick="selectScenario('ts')">
+            <div class="scen-top">
+              <span class="badge-vercel">Vercel</span>
+              <span class="scen-tag">Type Check</span>
+            </div>
+            <div class="scen-title">TypeScript TS2304: Cannot find name</div>
+            <div class="scen-meta">src/config.ts:12 • Type Check Failure</div>
+          </button>
+        </div>
+
+        <!-- Side-by-Side: Raw Logs vs Structured Error Extraction (Slide 4) -->
+        <div class="dual-grid">
+          <div class="pane-box">
+            <div class="pane-header">
+              <span>RAW DEPLOYMENT LOG</span>
+              <span class="badge-outline">INPUT TELEMETRY</span>
+            </div>
+            <pre id="rawLogPreview" class="code-terminal">Railway deployment failed
+
+Error: Cannot find module './config/database'
+at src/server.js:14</pre>
+          </div>
+
+          <div class="pane-box">
+            <div class="pane-header">
+              <span>STRUCTURED ERROR INFORMATION</span>
+              <span class="badge-outline">EXTRACTED ENTITIES</span>
+            </div>
+            <div class="entity-table">
+              <div class="entity-row">
+                <span class="e-key">Platform</span>
+                <span class="e-val" id="structPlatform">RAILWAY</span>
+              </div>
+              <div class="entity-row">
+                <span class="e-key">Target Service</span>
+                <span class="e-val text-cyan" id="structService">backend-api</span>
+              </div>
+              <div class="entity-row">
+                <span class="e-key">Error Classification</span>
+                <span class="e-val text-red" id="structType">MODULE_NOT_FOUND</span>
+              </div>
+              <div class="entity-row">
+                <span class="e-key">Source Path</span>
+                <span class="e-val font-mono" id="structFile">src/server.js</span>
+              </div>
+              <div class="entity-row">
+                <span class="e-key">Line Number</span>
+                <span class="e-val text-amber font-mono" id="structLine">14</span>
+              </div>
+              <div class="entity-row">
+                <span class="e-key">Normalized Message</span>
+                <span class="e-val text-muted" id="structMsg">module not found</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8-Step Pipeline Tracker (Slide 5 & 6) -->
+      <section class="card-box mb-6">
+        <div class="card-title-row">
+          <div>
+            <h2 class="section-heading">Autonomous Pipeline State Machine</h2>
+            <p class="section-subheading">Strict Dev Branch Isolation & Automated Self-Review</p>
+          </div>
+          <span class="badge-green">BRANCH POLICY: DEV ONLY</span>
+        </div>
+
+        <div class="pipeline-track">
+          <div class="pipeline-node" id="node-1">
+            <div class="node-circle">1</div>
+            <div class="node-text">
+              <strong>Error Ingest</strong>
+              <small>Webhook / Signature</small>
+            </div>
+          </div>
+          <div class="pipeline-node" id="node-2">
+            <div class="node-circle">2</div>
+            <div class="node-text">
+              <strong>Parse Stack</strong>
+              <small>Isolate Exception</small>
+            </div>
+          </div>
+          <div class="pipeline-node" id="node-3">
+            <div class="node-circle">3</div>
+            <div class="node-text">
+              <strong>Pull Dev Branch</strong>
+              <small>Target: Dev Only</small>
+            </div>
+          </div>
+          <div class="pipeline-node" id="node-4">
+            <div class="node-circle">4</div>
+            <div class="node-text">
+              <strong>LLM Root Cause</strong>
+              <small>Synthesize Context</small>
+            </div>
+          </div>
+          <div class="pipeline-node" id="node-5">
+            <div class="node-circle">5</div>
+            <div class="node-text">
+              <strong>Generate Fix</strong>
+              <small>Minimal Patch Diff</small>
+            </div>
+          </div>
+          <div class="pipeline-node" id="node-6">
+            <div class="node-circle">6</div>
+            <div class="node-text">
+              <strong>Validation Suite</strong>
+              <small>6 Quality Gates</small>
+            </div>
+          </div>
+          <div class="pipeline-node" id="node-7">
+            <div class="node-circle">7</div>
+            <div class="node-text">
+              <strong>Self Review</strong>
+              <small>AI Guardrail Review</small>
+            </div>
+          </div>
+          <div class="pipeline-node" id="node-8">
+            <div class="node-circle">8</div>
+            <div class="node-text">
+              <strong>Submit PR → Dev</strong>
+              <small>Telegram Alert Dispatched</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Minimal Fix Diff + 6 Validation Checks (Slide 7 & 8) -->
+      <div class="dual-grid mb-6">
+        <!-- Diff Viewer (Slide 7) -->
+        <div class="card-box">
+          <div class="card-title-row">
+            <div>
+              <h2 class="section-heading">Surgical Minimal Fix</h2>
+              <p class="section-subheading">Touches only the offending instruction</p>
+            </div>
+            <span class="badge-outline">MINIMAL DIFF</span>
+          </div>
+
+          <div class="diff-split">
+            <div class="diff-pane">
+              <div class="diff-file-tag text-red">BEFORE • <span id="diffFileBefore">src/server.js</span></div>
+              <pre id="codeBefore" class="diff-pre del-pre">const db = require(
+  "./config/database"
+);</pre>
+            </div>
+
+            <div class="diff-pane">
+              <div class="diff-file-tag text-emerald">AFTER • <span id="diffFileAfter">src/server.js</span></div>
+              <pre id="codeAfter" class="diff-pre add-pre">const db = require(
+  "./config/db"
+);</pre>
+            </div>
+          </div>
+          <div class="diff-footer-note">
+            <span class="text-emerald">✓ Verified:</span> Single line change avoids unintended side-effects.
+          </div>
+        </div>
+
+        <!-- 6 Validation Gates (Slide 8) -->
+        <div class="card-box">
+          <div class="card-title-row">
+            <div>
+              <h2 class="section-heading">Quality Gates (6 Checks)</h2>
+              <p class="section-subheading">PR creation blocked until all 6 checks succeed</p>
+            </div>
+            <span class="badge-green">ALL PASSING</span>
+          </div>
+
+          <div class="gates-grid">
+            <div class="gate-card" id="v-syntax">
+              <div class="gate-icon text-emerald">✓</div>
+              <div class="gate-info">
+                <strong>Syntax Check</strong>
+                <small>AST integrity verified</small>
+              </div>
+            </div>
+
+            <div class="gate-card" id="v-unit">
+              <div class="gate-icon text-emerald">✓</div>
+              <div class="gate-info">
+                <strong>Unit Tests</strong>
+                <small>Existing suites green</small>
+              </div>
+            </div>
+
+            <div class="gate-card" id="v-lint">
+              <div class="gate-icon text-emerald">✓</div>
+              <div class="gate-info">
+                <strong>Linter Pass</strong>
+                <small>Zero new style violations</small>
+              </div>
+            </div>
+
+            <div class="gate-card" id="v-build">
+              <div class="gate-icon text-emerald">✓</div>
+              <div class="gate-info">
+                <strong>Build Test</strong>
+                <small>Compiles without warning</small>
+              </div>
+            </div>
+
+            <div class="gate-card" id="v-integration">
+              <div class="gate-icon text-emerald">✓</div>
+              <div class="gate-info">
+                <strong>Integration Tests</strong>
+                <small>Service connects clean</small>
+              </div>
+            </div>
+
+            <div class="gate-card" id="v-security">
+              <div class="gate-icon text-emerald">✓</div>
+              <div class="gate-info">
+                <strong>Security Guard</strong>
+                <small>No credentials exposed</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telegram Notification Message Card (Slide 10 & 11) -->
+      <section class="card-box mb-6">
+        <div class="card-title-row">
+          <div>
+            <h2 class="section-heading">Dispatched Telegram DevOps Alert</h2>
+            <p class="section-subheading">Interactive message payload sent to on-call engineering team</p>
+          </div>
+          <span class="badge-blue">TELEGRAM API</span>
+        </div>
+
+        <div class="tg-message-bubble">
+          <div class="tg-msg-header">
+            <div class="tg-bot-badge">
+              <span class="tg-icon">✈</span>
+              <div>
+                <strong>DevOps AutoFix Agent</strong>
+                <small>Bot • @dvps40_autofix_bot</small>
+              </div>
+            </div>
+            <span class="tg-time" id="tgTime">Just now</span>
+          </div>
+
+          <div class="tg-msg-body">
+            <div class="tg-alert-badge">🚨 CRITICAL INCIDENT AUTO-REPAIRED</div>
+            <div class="tg-kv"><span class="tg-k">Platform:</span> <span class="tg-v" id="tgPlatformVal">Railway Deployment</span></div>
+            <div class="tg-kv"><span class="tg-k">Root Cause:</span> <span class="tg-v" id="tgRootCauseVal">ModuleNotFound: Cannot find module './config/database'</span></div>
+            <div class="tg-kv"><span class="tg-k">Target Branch:</span> <span class="tg-v text-cyan font-mono">dev</span></div>
+            <div class="tg-kv"><span class="tg-k">Isolated Patch:</span> <span class="tg-v text-emerald font-mono" id="tgFixBranch">fix/railway-dep-999</span></div>
+            <div class="tg-kv"><span class="tg-k">Review Status:</span> <span class="tg-v text-emerald">Automated Self-Review Approved (Score: 10/10)</span></div>
+          </div>
+
+          <div class="tg-actions">
+            <a href="#" id="tgPrLinkBtn" target="_blank" class="tg-action-btn primary">
+              <span>View Pull Request #42 on GitHub</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <button class="tg-action-btn secondary" onclick="switchTab('audit')">View Incident Audit Log</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ====================================================================
+         TAB: TELEGRAM BOT CONSOLE & SIMULATION CLIENT
+         ==================================================================== -->
+    <div id="tab-telegram" class="tab-pane">
+      <section class="card-box mb-6">
+        <div class="card-title-row">
+          <div>
+            <h2 class="section-heading">Interactive Telegram Bot Console</h2>
+            <p class="section-subheading">Test bot commands, trigger on-call fixes, and view live MarkdownV2 formatting</p>
+          </div>
+          <span class="badge-blue">@dvps40_autofix_bot</span>
+        </div>
+
+        <div class="dual-grid">
+          <!-- Bot Chat Terminal -->
+          <div>
+            <div class="tg-chat-window">
+              <div class="tg-chat-header">
+                <div class="tg-bot-badge">
+                  <span class="tg-icon">✈</span>
+                  <div>
+                    <strong>DVPS40 DevOps AutoFix Bot</strong>
+                    <small>Active • Dev Branch Guarded</small>
+                  </div>
+                </div>
+                <span class="badge-green">POLLING READY</span>
+              </div>
+
+              <!-- Message History Area -->
+              <div class="tg-chat-messages" id="tgChatHistory">
+                <div class="tg-bubble bot">
+                  <div class="tg-bubble-name">DevOps AutoFix Agent</div>
+                  <div class="tg-bubble-text">
+                    👋 <strong>Hello! I am the DVPS40 Autonomous Bot.</strong><br><br>
+                    I monitor deployment errors, diagnose root causes with GPT-4o, validate 6 quality gates, and open PRs strictly to <code>dev</code>.<br><br>
+                    Try clicking a quick command below or type <code>/simulate</code> to watch me auto-repair a crash.
+                  </div>
+                  <div class="tg-bubble-time">11:42 AM</div>
+                </div>
+              </div>
+
+              <!-- Quick Command Buttons -->
+              <div class="tg-quick-commands">
+                <button class="tg-chip-btn" onclick="sendTgCommand('/status')">/status</button>
+                <button class="tg-chip-btn" onclick="sendTgCommand('/simulate')">/simulate</button>
+                <button class="tg-chip-btn" onclick="sendTgCommand('/incidents')">/incidents</button>
+                <button class="tg-chip-btn" onclick="sendTgCommand('/help')">/help</button>
+              </div>
+
+              <!-- Chat Input Bar -->
+              <div class="tg-input-bar">
+                <input type="text" id="tgChatInput" class="form-input" placeholder="Type a bot command (/simulate, /status, /fix &lt;logs&gt;)..." onkeydown="if(event.key==='Enter') dispatchTgMessage()">
+                <button class="primary-btn" onclick="dispatchTgMessage()">
+                  <span>Send</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Telegram Bot Configuration & Docs -->
+          <div>
+            <div class="pane-box mb-4">
+              <div class="pane-header">
+                <span>BOT CONNECTION STATUS</span>
+                <span class="badge-tag">PYTHON-TELEGRAM-BOT</span>
+              </div>
+              <div class="p-4" style="padding: 1rem;">
+                <div class="entity-row">
+                  <span class="e-key">Bot Username:</span>
+                  <span class="e-val font-mono text-cyan">@dvps40_autofix_bot</span>
+                </div>
+                <div class="entity-row">
+                  <span class="e-key">Standalone Runner:</span>
+                  <span class="e-val font-mono text-emerald">python telegram_bot.py</span>
+                </div>
+                <div class="entity-row">
+                  <span class="e-key">Target Protection:</span>
+                  <span class="e-val font-mono text-cyan">dev (Locked Base)</span>
+                </div>
+                <div class="entity-row">
+                  <span class="e-key">Dispatch Format:</span>
+                  <span class="e-val font-mono">MarkdownV2 + Inline Buttons</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane-box">
+              <div class="pane-header">
+                <span>TERMINAL COMMAND GUIDE</span>
+              </div>
+              <div class="p-4" style="padding: 1rem; font-size: 0.8rem; line-height: 1.6;">
+                <p class="mb-3 text-dim">To run this bot live in background from your terminal:</p>
+                <pre class="code-terminal mb-3" style="height: auto; padding: 0.75rem;">cd "C:\Users\Rohit Singh\Desktop\dvps40-autofix-bot"
+.venv\Scripts\python telegram_bot.py</pre>
+                <p class="text-dim">When using real tokens from <code>@BotFather</code>, configure <code>TELEGRAM_BOT_TOKEN</code> in <code>.env</code> and the bot will start live background polling.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ====================================================================
+         TAB 2: LIVE TELEMETRY & METRICS CHARTS
+         ==================================================================== -->
+    <div id="tab-metrics" class="tab-pane">
+      <div class="dual-grid mb-6">
+        <!-- Visual Bar Chart: Incidents by Platform -->
+        <div class="card-box">
+          <div class="card-title-row">
+            <div>
+              <h2 class="section-heading">Platform Ingestion Distribution</h2>
+              <p class="section-subheading">Inbound failure alerts processed by secondary source</p>
+            </div>
+            <span class="badge-outline">REAL-TIME TELEMETRY</span>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-bar-group">
+              <div class="bar-label-row">
+                <span>Railway Deployment Crashes</span>
+                <strong id="barRailwayVal">12 incidents (60%)</strong>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill fill-railway" style="width: 60%"></div>
+              </div>
+            </div>
+
+            <div class="chart-bar-group">
+              <div class="bar-label-row">
+                <span>Vercel Build / Runtime Errors</span>
+                <strong id="barVercelVal">8 incidents (40%)</strong>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill fill-vercel" style="width: 40%"></div>
+              </div>
+            </div>
+
+            <div class="chart-bar-group">
+              <div class="bar-label-row">
+                <span>Direct Mock Simulations</span>
+                <strong id="barSimVal">15 runs</strong>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill fill-cyan" style="width: 75%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Latency & Quality Metrics -->
+        <div class="card-box">
+          <div class="card-title-row">
+            <div>
+              <h2 class="section-heading">Pipeline Health Metrics</h2>
+              <p class="section-subheading">Mean time to resolution & patch verification statistics</p>
+            </div>
+            <span class="badge-green">SLO STATUS: OPTIMAL</span>
+          </div>
+
+          <div class="metrics-card-grid">
+            <div class="micro-stat-card">
+              <div class="micro-stat-num text-cyan" id="metricMttR">1.8s</div>
+              <div class="micro-stat-desc">Avg Auto-Fix Latency</div>
+            </div>
+            <div class="micro-stat-card">
+              <div class="micro-stat-num text-emerald">100%</div>
+              <div class="micro-stat-desc">Validation Pass Rate</div>
+            </div>
+            <div class="micro-stat-card">
+              <div class="micro-stat-num text-purple">0</div>
+              <div class="micro-stat-desc">Main Branch Violations</div>
+            </div>
+            <div class="micro-stat-card">
+              <div class="micro-stat-num text-amber">0ms</div>
+              <div class="micro-stat-desc">Downtime Introduced</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Architecture Defense Rules -->
+      <section class="card-box">
+        <h2 class="section-heading mb-3">DevOps Safety & Branch Protection Rules</h2>
+        <div class="rules-table-box">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th>Rule Name</th>
+                <th>Enforcement Method</th>
+                <th>Target</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Dev Isolation</strong></td>
+                <td>Git tree checked out strictly from <code>dev</code> branch</td>
+                <td>Source code</td>
+                <td><span class="badge-green">ACTIVE</span></td>
+              </tr>
+              <tr>
+                <td><strong>PR Target Guard</strong></td>
+                <td>Pull Requests strictly created against <code>base: dev</code></td>
+                <td>GitHub API</td>
+                <td><span class="badge-green">ENFORCED</span></td>
+              </tr>
+              <tr>
+                <td><strong>HMAC SHA-256 Auth</strong></td>
+                <td>Constant-time signature check on all webhook bodies</td>
+                <td>Endpoints</td>
+                <td><span class="badge-green">ACTIVE</span></td>
+              </tr>
+              <tr>
+                <td><strong>Pre-PR Validation Block</strong></td>
+                <td>Any failure in 6 quality gates prevents PR creation</td>
+                <td>CI Pipeline</td>
+                <td><span class="badge-green">ACTIVE</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ====================================================================
+         TAB 3: INTERACTIVE WEBHOOK PLAYGROUND
+         ==================================================================== -->
+    <div id="tab-playground" class="tab-pane">
+      <section class="card-box">
+        <div class="card-title-row">
+          <div>
+            <h2 class="section-heading">Webhook Ingestion Playground</h2>
+            <p class="section-subheading">Submit real JSON payloads to verify HMAC validation and background triage</p>
+          </div>
+          <span class="badge-blue">LIVE API CLIENT</span>
+        </div>
+
+        <div class="dual-grid">
+          <!-- Request Builder -->
+          <div>
+            <div class="form-group mb-3">
+              <label class="form-label">Destination Platform & Endpoint</label>
+              <select id="playPlatform" class="form-select" onchange="updatePlaygroundTemplate()">
+                <option value="railway">Railway: /webhooks/railway</option>
+                <option value="vercel">Vercel: /webhooks/vercel</option>
+                <option value="simulate">Internal Simulator: /api/simulate</option>
+              </select>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">Custom Secret Token (Optional)</label>
+              <input type="text" id="playSecret" class="form-input" value="your-random-hex-secret-here" placeholder="Webhook signing secret">
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">JSON Request Payload</label>
+              <textarea id="playPayload" class="form-textarea" rows="10"></textarea>
+            </div>
+
+            <div class="flex-row-gap">
+              <button class="primary-btn" onclick="sendPlaygroundWebhook()">
+                <span>Dispatch Webhook Request</span>
+              </button>
+              <button class="secondary-btn" onclick="updatePlaygroundTemplate()">
+                Reset Template
+              </button>
+            </div>
+          </div>
+
+          <!-- Live API Response -->
+          <div>
+            <div class="pane-box h-full">
+              <div class="pane-header">
+                <span>SERVER RESPONSE</span>
+                <span class="badge-outline" id="playStatusBadge">IDLE</span>
+              </div>
+              <pre id="playResponse" class="code-terminal h-full">// Response will render here when request is dispatched...</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ====================================================================
+         TAB 4: INCIDENT HISTORY & AUDIT LOG
+         ==================================================================== -->
+    <div id="tab-audit" class="tab-pane">
+      <section class="card-box">
+        <div class="card-title-row">
+          <div>
+            <h2 class="section-heading">Incident History & Audit Trail</h2>
+            <p class="section-subheading">Persistent audit records of every ingested crash, diagnosis, patch, and PR</p>
+          </div>
+          <button class="secondary-btn" onclick="loadIncidents()">
+            <span>Refresh Table</span>
+          </button>
+        </div>
+
+        <div class="table-card">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Platform</th>
+                <th>Project / Service</th>
+                <th>Error Classification</th>
+                <th>Status</th>
+                <th>Target Branch</th>
+                <th>Pull Request</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <tr>
+                <td colspan="7" class="text-center py-6 text-muted">Loading incident records...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div>DVPS40 Autonomous DevOps Telegram Bot • Production Grade Engine</div>
+      <div class="text-muted">FastAPI Backend • Dev Branch Isolation • Native WebSocket/Polled Telemetry</div>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
